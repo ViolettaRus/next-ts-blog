@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Цель репозитория
 
-## Getting Started
+Этот репозиторий демонстрирует ключевые возможности **Next.js App Router** на практическом примере блога и дэшборда:
 
-First, run the development server:
+- **динамические маршруты** (`/blog/[id]`);
+- **обработку ошибок и состояний загрузки**;
+- **metadata API** (SEO / OpenGraph / Twitter);
+- **вложенные и параллельные маршруты** (`/dashboard`, `@stats`, `@activity`);
+- базовую **навигацию и prefetch** для оптимизации переходов.
+
+Репозиторий можно использовать как учебный пример или как стартовый шаблон для собственного проекта.
+
+## Решаемая задача
+
+Цель – показать, **как правильно организовать структуру App Router-проекта** и реализовать типичные требования:
+
+- **Блог**: список статей с сервера, детальная страница по `id`, обработка 404 и ошибок загрузки.
+- **SEO**: настройка `metadata`, включая `openGraph` и `twitter`, а также `generateMetadata` для динамических страниц.
+- **UX**: состояния `loading` и `error`, понятная навигация, быстрые переходы за счёт `prefetch`.
+- **Dashboard**: пример, как одновременно отображать несколько независимых участков интерфейса через **параллельные маршруты**.
+
+## Структура проекта
+
+Основные директории и файлы:
+
+- **`app/`** – корень App Router:
+  - **`layout.tsx`** – общий layout приложения, шапка с навигацией и базовые `metadata`.
+  - **`page.tsx`** – главная страница с кратким описанием демо.
+- **`app/blog/`** – раздел блога:
+  - **`layout.tsx`** – общий layout для всех страниц блога.
+  - **`page.tsx`** – список статей, загружаемых с публичного API (`jsonplaceholder.typicode.com`).
+  - **`loading.tsx`** – состояние загрузки списка статей.
+  - **`error.tsx`** – обработчик ошибок загрузки, с кнопкой повторной попытки.
+  - **`not-found.tsx`** – кастомная 404 для несуществующих статей.
+  - **`[id]/page.tsx`** – динамическая страница статьи, включает `generateMetadata`.
+- **`app/dashboard/`** – раздел дэшборда:
+  - **`layout.tsx`** – layout, который одновременно рендерит основной контент и параллельные слоты.
+  - **`page.tsx`** – основной блок «Обзор».
+  - **`@stats/page.tsx`** – параллельный маршрут со сводной статистикой.
+  - **`@activity/page.tsx`** – параллельный маршрут с последней активностью.
+
+Остальная часть проекта – стандартный шаблон `create-next-app` (TypeScript, ESLint, шрифты Geist).
+
+## Как запустить проект локально
+
+Требования:
+
+- Node.js (рекомендуется актуальная LTS-версия);
+- npm (по умолчанию идёт вместе с Node.js).
+
+### Установка зависимостей
+
+```bash
+npm install
+```
+
+### Запуск dev-сервера
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+По умолчанию приложение будет доступно по адресу:  
+[`http://localhost:3000`](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Основные маршруты для проверки
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **`/`** – главная страница с описанием демо.
+- **`/blog`** – список статей блога (загрузка с внешнего API).
+- **`/blog/1`**, `/blog/2`, ... – детальная страница статьи по `id`.
+- **`/blog/9999`** (несуществующий id) – демонстрация `not-found`.
+- **`/dashboard`** – дэшборд:
+  - основной контент (`page.tsx`) + параллельные маршруты `@stats` и `@activity` на одной странице.
 
-## Learn More
+## Как тестировать и что смотреть
 
-To learn more about Next.js, take a look at the following resources:
+- **Загрузка и ошибки**:
+  - Откройте `/blog` и обратите внимание на скелетон из `loading.tsx`.
+  - Можно временно «сломать» URL в `fetch` внутри `app/blog/page.tsx` или `[id]/page.tsx`, чтобы увидеть работу `error.tsx`.
+- **404 в блоге**:
+  - Перейдите на `/blog/9999` – должна отрендериться `app/blog/not-found.tsx`.
+- **Metadata / SEO**:
+  - На страницах блога посмотрите `<head>` в DevTools (Network → Document → Headers / Preview), чтобы увидеть сгенерированные `title`, `description`, `og:*` и `twitter:*`.
+- **Параллельные маршруты**:
+  - Перейдите на `/dashboard` и убедитесь, что основной контент, блок статистики и активности рендерятся одновременно и независимо друг от друга.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Полезные ссылки
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [Документация по Markdown на GitHub](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+- [Next.js App Router](https://nextjs.org/docs/app)
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
